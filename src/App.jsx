@@ -112,7 +112,7 @@ const App = () => {
 
       {/* Input Box */}
       <form
-        className="fixed bottom-5 left-1/2 right-0 -translate-x-1/2 px-4 py-3 flex items-center gap-2 w-full max-w-xl"
+        className="fixed bottom-5 left-1/2 right-0 -translate-x-1/2 px-4 py-3 flex items-center gap-2 w-full max-w-xl bg-back"
         onSubmit={sendMessage}
       >
         <input
