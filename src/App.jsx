@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { IoSendSharp } from "react-icons/io5";
 import { io } from "socket.io-client";
 
-const socket = io(import.meta.env.VITE_BACKEND_URL);
+// ✅ safer socket connection
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
+  withCredentials: true,
+});
 
 function TypingIndicator() {
   return (
@@ -34,14 +37,24 @@ const App = () => {
   }, [messages, loading]);
 
   useEffect(() => {
-    // listen for ai responses from backend
+    // listen for ai responses
     socket.on("ai-response", (aiText) => {
-      setMessages((msgs) => [...msgs, { role: "ai", content: aiText }]);
+      setMessages((msgs) => [...msgs, { role: "model", content: aiText }]);
+      setLoading(false);
+    });
+
+    // handle connection errors
+    socket.on("connect_error", () => {
+      setMessages((msgs) => [
+        ...msgs,
+        { role: "system", content: "⚠️ Cannot connect to server." },
+      ]);
       setLoading(false);
     });
 
     return () => {
       socket.off("ai-response");
+      socket.off("connect_error");
     };
   }, []);
 
@@ -51,12 +64,10 @@ const App = () => {
 
     const userMsg = { role: "user", content: input };
 
-    // update UI immediately
     setMessages((msgs) => [...msgs, userMsg]);
     setInput("");
     setLoading(true);
 
-    // send message to backend
     socket.emit("message", input);
   };
 
@@ -114,7 +125,7 @@ const App = () => {
         />
         <button
           type="submit"
-          className="bg-grow rounded-full px-[12.5px] py-3  active:bg-grow/10 outline-none transition cursor-pointer"
+          className="bg-grow rounded-full px-[12.5px] py-3 active:bg-grow/10 outline-none transition cursor-pointer"
           disabled={loading || !input.trim()}
         >
           <IoSendSharp className="text-back text-lg" />
