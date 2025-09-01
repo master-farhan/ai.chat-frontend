@@ -1,12 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IoSendSharp } from "react-icons/io5";
 import { io } from "socket.io-client";
-import dotenv from "dotenv";
-dotenv.config();
 
-
-// ✅ safer socket connection
-const socket = io(process.env.VITE_BACKEND_URL, {
+// Use Vite's env
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
   withCredentials: true,
 });
 
