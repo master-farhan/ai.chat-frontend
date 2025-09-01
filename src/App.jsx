@@ -4,17 +4,27 @@ import { io } from "socket.io-client";
 import dotenv from "dotenv";
 dotenv.config();
 
+
 // ✅ safer socket connection
-const socket = io(import.meta.env.VITE_BACKEND_URL, {
+const socket = io(process.env.VITE_BACKEND_URL, {
   withCredentials: true,
 });
 
 function TypingIndicator() {
   return (
     <div className="flex items-center gap-1 h-6 pl-2">
-      <span className="animate-bounce w-2 h-2 bg-gray-400 rounded-full" style={{ animationDelay: "0s" }} />
-      <span className="animate-bounce w-2 h-2 bg-gray-400 rounded-full" style={{ animationDelay: ".2s" }} />
-      <span className="animate-bounce w-2 h-2 bg-gray-400 rounded-full" style={{ animationDelay: ".4s" }} />
+      <span
+        className="animate-bounce w-2 h-2 bg-gray-400 rounded-full"
+        style={{ animationDelay: "0s" }}
+      />
+      <span
+        className="animate-bounce w-2 h-2 bg-gray-400 rounded-full"
+        style={{ animationDelay: ".2s" }}
+      />
+      <span
+        className="animate-bounce w-2 h-2 bg-gray-400 rounded-full"
+        style={{ animationDelay: ".4s" }}
+      />
     </div>
   );
 }
@@ -30,11 +40,13 @@ const App = () => {
   }, [messages, loading]);
 
   useEffect(() => {
+    // listen for ai responses
     socket.on("ai-response", (aiText) => {
       setMessages((msgs) => [...msgs, { role: "model", content: aiText }]);
       setLoading(false);
     });
 
+    // handle connection errors
     socket.on("connect_error", () => {
       setMessages((msgs) => [
         ...msgs,
@@ -53,27 +65,37 @@ const App = () => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    setMessages((msgs) => [...msgs, { role: "user", content: input }]);
+    const userMsg = { role: "user", content: input };
+
+    setMessages((msgs) => [...msgs, userMsg]);
     setInput("");
     setLoading(true);
+
     socket.emit("message", input);
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-white">
+    <div className="flex flex-col h-screen pb-10 bg-back">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 h-14 flex items-center px-4 bg-gray-800 z-20 shadow-md">
-        <h1 className="text-lg font-bold">AI Chat</h1>
+      <header className="fixed top-0 left-0 right-0 h-14 flex items-center px-4 z-10">
+        <h1 className="text-lg font-bold text-grow">AI Chat</h1>
       </header>
 
       {/* Chat Area */}
-      <main className="flex-1 pt-14 pb-24 overflow-y-auto w-full max-w-2xl mx-auto px-2">
+      <main className="flex-1 pt-14 pb-20 overflow-y-auto scroll-hidden w-full max-w-2xl mx-auto px-2">
         <div className="flex flex-col gap-4">
           {messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div
+              key={idx}
+              className={`flex ${
+                msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
               <div
-                className={`max-w-[80%] px-4 py-2 rounded-2xl ${
-                  msg.role === "user" ? "bg-gray-700 text-white rounded-l-2xl" : "bg-gray-200 text-gray-900 rounded-r-2xl"
+                className={`max-w-[80%] px-4 py-2 rounded-t-2xl ${
+                  msg.role === "user"
+                    ? "bg-gray-800 text-grow rounded-l-2xl"
+                    : "text-grow rounded-r-2xl"
                 }`}
               >
                 {msg.content}
@@ -82,7 +104,7 @@ const App = () => {
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="rounded-2xl px-4 py-2 bg-gray-200">
+              <div className="rounded-2xl px-4 py-2">
                 <TypingIndicator />
               </div>
             </div>
@@ -93,12 +115,12 @@ const App = () => {
 
       {/* Input Box */}
       <form
-        className="fixed bottom-0 left-0 right-0 px-4 py-3 flex items-center gap-2 bg-gray-800 z-20"
+        className="fixed bottom-5 left-1/2 right-0 -translate-x-1/2 px-4 py-3 flex items-center gap-2 w-full max-w-xl"
         onSubmit={sendMessage}
       >
         <input
           type="text"
-          className="flex-1 rounded-full border border-gray-600 px-4 py-2 focus:outline-none text-white bg-gray-700 placeholder-gray-400 focus:border-gray-500"
+          className="flex-1 rounded-full border-[1px] border-grow/10 px-4 py-2 focus:outline-none text-grow focus:border-grow"
           placeholder="Type your message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -106,10 +128,10 @@ const App = () => {
         />
         <button
           type="submit"
-          className="bg-green-500 rounded-full px-3 py-2 active:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-grow rounded-full px-[12.5px] py-3 active:bg-grow/10 outline-none transition cursor-pointer"
           disabled={loading || !input.trim()}
         >
-          <IoSendSharp className="text-white text-lg" />
+          <IoSendSharp className="text-back text-lg" />
         </button>
       </form>
     </div>
