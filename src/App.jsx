@@ -112,12 +112,12 @@ const App = () => {
 
       {/* Input Box */}
       <form
-        className="fixed bottom-5 left-1/2 right-0 -translate-x-1/2 px-4 py-3 flex items-center gap-2 w-full max-w-xl bg-back"
+        className="fixed bottom-5 left-1/2 right-0 -translate-x-1/2 px-4 py-3 flex items-center gap-2 w-full max-w-xl"
         onSubmit={sendMessage}
       >
         <input
           type="text"
-          className="flex-1 rounded-full border-[1px] border-grow/10 px-4 py-2 focus:outline-none text-grow focus:border-grow"
+          className="flex-1 bg-back rounded-full border-[1px] border-grow/10 px-4 py-2 focus:outline-none text-grow focus:border-grow"
           placeholder="Type your message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
